@@ -11,7 +11,7 @@ permissions:
 # 
 hooks:
   BeforeInstall:
-    - location: scripts/clean_instance.sh
+    - location: scripts/clean_existing.sh
       timeout: 300
       runas: ubuntu
   AfterInstall:

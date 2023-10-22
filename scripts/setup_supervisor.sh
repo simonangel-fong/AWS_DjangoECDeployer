@@ -1,4 +1,10 @@
 #!/bin/bash
+#Program Name: setup_supervisor.sh
+#Author name: Wenhao Fang
+#Date Created: Oct 21th 2023
+#Description of the script: 
+#   Install supervisor package
+#   Create gunicorn.conf and django.conf
 
 ###########################################################
 ## Configuration supervisor

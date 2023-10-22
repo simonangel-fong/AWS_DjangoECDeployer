@@ -1,8 +1,12 @@
 #!/bin/bash
+#Program Name: setup_env.sh
+#Author name: Wenhao Fang
+#Date Created: Oct 21th 2023
+#Description of the script:
+#   Clean existing env
+#   Install pip package
+#   Creates virtual environment
 
-sudo rm -rf ~/env     # remove existing venv
-echo "remove env" >> ~/log
-sudo apt-get -y install python3-venv # Install pip package
-echo "install env" >> ~/log
-python3 -m venv ~/env # Creates virtual environment
-echo "create env" >> ~/log
+sudo rm -rf ~/env                    # remove existing venv
+sudo apt-get install -y python3-venv # Install pip package
+python3 -m venv ~/env                # Creates virtual environment

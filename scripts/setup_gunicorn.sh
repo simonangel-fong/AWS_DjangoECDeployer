@@ -1,4 +1,10 @@
-#!/usr/bin/bash
+#!/bin/bash
+#Program Name: setup_gunicorn.sh
+#Author name: Wenhao Fang
+#Date Created: Oct 21th 2023
+#Description of the script: 
+#   Install gunicorn in VEnv
+#   Create gunicorn.socket and gunicorn.service
 
 source ~/env/bin/activate # activate venv
 pip install gunicorn      # install gunicorn

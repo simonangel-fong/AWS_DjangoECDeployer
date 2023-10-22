@@ -1,4 +1,10 @@
 #!/bin/bash
+#Program Name: setup_nginx.sh
+#Author name: Wenhao Fang
+#Date Created: Oct 21th 2023
+#Description of the script: 
+#   Install nginx package
+#   Create nginx.conf and django.conf
 
 ###########################################################
 ## Configuration nginx
@@ -14,7 +20,7 @@ django_conf=/etc/nginx/sites-available/django.conf
 sudo bash -c "cat >$django_conf <<DJANGO_CONF
 server {
 listen 80;
-server_name 54.146.214.123 arguswatcher.net www.arguswatcher.net;
+server_name arguswatcher.net www.arguswatcher.net;
 location = /favicon.ico { access_log off; log_not_found off; }
 location /static/ {
     root /home/ubuntu/EC-Django-Deploy/CraftyCoders;
@@ -37,4 +43,3 @@ sudo ln -sf /etc/nginx/sites-available/django.conf /etc/nginx/sites-enabled
 # restart nginx
 sudo nginx -t
 sudo systemctl restart nginx
-# read -p "Press Enter to continue..."
