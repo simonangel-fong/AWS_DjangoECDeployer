@@ -1,8 +1,15 @@
 asgiref==3.7.2
-Django==4.2.5
+boto3==1.28.68
+botocore==1.31.68
+Django==4.2.6
 django-bootstrap5==23.3
 django-environ==0.11.2
+jmespath==1.0.1
 PyMySQL==1.1.0
+python-dateutil==2.8.2
+s3transfer==0.7.0
+six==1.16.0
 sqlparse==0.4.4
-typing_extensions==4.7.1
+typing_extensions==4.8.0
 tzdata==2023.3
+urllib3==1.26.18

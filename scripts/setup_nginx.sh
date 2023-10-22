@@ -3,7 +3,7 @@
 ###########################################################
 ## Configuration nginx
 ###########################################################
-sudo apt-get install nginx # install nginx
+sudo apt-get install -y nginx # install nginx
 
 # overwrites user
 nginx_conf=/etc/nginx/nginx.conf

@@ -3,7 +3,7 @@
 ###########################################################
 ## Configuration supervisor
 ###########################################################
-sudo apt-get install supervisor # install supervisor
+sudo apt-get install -y supervisor # install supervisor
 
 sudo mkdir -p /var/log/gunicorn # create directory for logging
 
