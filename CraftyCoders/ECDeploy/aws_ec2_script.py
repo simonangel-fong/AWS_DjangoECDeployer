@@ -126,7 +126,10 @@ def create_instance_by_template(launch_template_name, instance_name=None, user_d
 def stop_instance_by_name(name_list):
     ''' Stop running instances within a name list. '''
 
-    ec2 = boto3.resource('ec2')
+    ec2 = boto3.resource(
+        service_name='ec2',
+        region_name='us-east-1'
+    )
     filter = [
         {
             'Name': 'instance-state-name',
@@ -147,7 +150,11 @@ def terminate_instance_by_name(name_list):
     if name_list == None:
         raise ValueError("Parameter name_list is required.")
     else:
-        ec2 = boto3.resource('ec2')
+
+        ec2 = boto3.resource(
+            service_name='ec2',
+            region_name='us-east-1'
+        )
         filter = [
             {
                 'Name': 'instance-state-name',
