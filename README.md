@@ -23,10 +23,10 @@ Team Name: CraftyCoders
       - gunicorn
       - nginx
       - supervisor
-    - Snapshot
+    - Template
 
 - App:
-  - update script: user data
-  - Admin account
-  - Login required
+  - [x] update script: user data
+  - [x] Login required
+  - [x] Admin account
   

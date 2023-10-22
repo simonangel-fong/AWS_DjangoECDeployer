@@ -40,6 +40,40 @@
           </a>
         </li>
       </ul>
+
+      {% if not user.is_authenticated %}
+      <a class="btn btn-sm btn-warning" href="{% url 'Account:login' %}"
+        >Login</a
+      >
+      {% else %}
+      <ul class="navbar-nav mb-2 mb-lg-0">
+        <li class="nav-item dropstart">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="bi bi-person-circle"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <li><h6 class="dropdown-header">{{user.username}}</h6></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'Account:profile' %}"
+                >Profile</a
+              >
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'Account:logout' %}"
+                >Logout</a
+              >
+            </li>
+          </ul>
+        </li>
+      </ul>
+      {% endif %}
     </div>
   </div>
 </nav>

@@ -1,0 +1,48 @@
+{% extends "layout/base.html" %} {% block main %}
+<header>
+  <h1 class="heading text-center">{{heading}}</h1>
+  <hr />
+</header>
+
+<div class="row p-3 m-3">
+  <div class="col-4 mx-auto">
+    {% if form.errors %}
+    <p class="text-danger">
+      Your username and password didn't match.Please try again!
+    </p>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="row py-3">
+        <label for="id_username" class="form-label">Username</label>
+        {{form.username}} <br />
+      </div>
+      <div class="row py-3">
+        <label for="id_password" class="form-label">Password</label>
+        {{form.password}} <br />
+      </div>
+
+      <div class="row py-3">
+        <button class="btn btn-primary w-100 py-2 my-1" type="submit">
+          Login
+        </button>
+        <a
+          class="btn btn-outline-secondary w-100 py-2 my-1"
+          href="{% url 'home' %}"
+          >Cancel</a
+        >
+        <input type="hidden" name="next" value="{{ next }}" />
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %} {% block js %}
+<script>
+  $(document).ready(() => {
+    const username = $("#id_username");
+    const password = $("#id_password");
+    username.addClass("form-control");
+    password.addClass("form-control");
+  });
+</script>
+{% endblock %}

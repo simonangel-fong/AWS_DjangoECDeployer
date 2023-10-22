@@ -10,8 +10,7 @@ import json
 from .aws_ec2_script import (create_instance_by_template,
                              terminate_instance_by_name, read_user_data_script,
                              list_instance_by_name, list_all_instance)
-# from .ssh.ssh_connect import ssh_command_to_ec2
-from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 SCRIPT_PATH = Path(
@@ -22,7 +21,7 @@ SCRIPT_PATH = Path(
 EC2_TEMPLATE = "EC-Deploy-Template"
 
 
-class InstanceListView(ListView):
+class InstanceListView(LoginRequiredMixin, ListView):
     ''' A view to list all EC2 instances '''
 
     model = Instance
@@ -35,7 +34,7 @@ class InstanceListView(ListView):
         return context
 
 
-class InstanceCreateView(SuccessMessageMixin, CreateView):
+class InstanceCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     ''' A view to create a new EC2 instance '''
 
     model = Instance
@@ -93,7 +92,7 @@ class InstanceCreateView(SuccessMessageMixin, CreateView):
         return render(request, self.template_name, {"form": form})
 
 
-class SuccessView(TemplateView):
+class SuccessView(LoginRequiredMixin, TemplateView):
     ''' A view to display success message. '''
 
     template_name = "ECDeploy/success.html"
@@ -105,7 +104,7 @@ class SuccessView(TemplateView):
         return context
 
 
-class InstanceDetailView(DetailView):
+class InstanceDetailView(LoginRequiredMixin, DetailView):
     ''' A view for details of a specified instance '''
 
     model = Instance
@@ -118,7 +117,7 @@ class InstanceDetailView(DetailView):
         return context
 
 
-class InstanceTerminateView(SuccessMessageMixin, DeleteView):
+class InstanceTerminateView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     ''' A view to terminate a specified instance '''
 
     model = Instance
@@ -170,19 +169,3 @@ def get_all_instance_info(request, instance_name):
         return JsonResponse({'status': 'success', 'data': json.dumps(ec2_list)}, status=200)
     except Exception as ex:
         return JsonResponse({'status': 'error', 'error': ex}, status=404)
-
-
-# def update_code(request, instance_name):
-#     ''' Updates codes from github and re-deploy '''
-
-#     try:
-#         ec2_list = list_instance_by_name((instance_name,))
-#         # gets the public ip
-#         public_ip = ec2_list[0]["public_ip"]
-#         # connects to ec2 with public ip and private key, and execute update.sh script
-#         result = ssh_command_to_ec2(settings.RSAKEY_PATH, public_ip, "ubuntu",
-#                                     "sudo bash -c 'source update.sh'")
-
-#         return JsonResponse({'status': 'success', 'data': result}, status=200)
-#     except Exception as ex:
-#         return JsonResponse({'status': 'error', 'error': ex}, status=404)

@@ -1,0 +1,12 @@
+{% extends "layout/base.html" %} {% block main %}
+<header>
+  <h1 class="heading text-center">{{heading}}</h1>
+  <hr />
+</header>
+
+<div class="row pt-3">
+  <div class="col-8 mx-auto">{{user.username}} {{user.email}}</div>
+</div>
+
+<script></script>
+{% endblock %}

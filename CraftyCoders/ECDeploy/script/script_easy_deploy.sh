@@ -2,7 +2,7 @@
 # Program Name: script_easy_deploy.sh
 # Author name: Wenhao Fang
 # Date Created: Oct 3rd 2023
-# Date updated: Oct 3rd 2023
+# Date updated: Oct 2nd 2023
 # Description of the script:
 #   Sets up EC2 to deploy django app using user data.
 #   No .env file.

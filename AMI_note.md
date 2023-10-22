@@ -4,11 +4,7 @@
   - [AMI Setting](#ami-setting)
   - [Packages](#packages)
   - [Related Scrtipt](#related-scrtipt)
-    - [`clean_existing.sh`](#clean_existingsh)
-    - [`update_venv_package.sh`](#update_venv_packagesh)
-    - [`setup_gunicorn.sh`](#setup_gunicornsh)
-    - [`setup_nginx.sh`](#setup_nginxsh)
-    - [`setup_supervisor.sh`](#setup_supervisorsh)
+    - [`script_easy_deploy.sh`](#script_easy_deploysh)
 
 ---
 
@@ -106,61 +102,87 @@ echo -e "$(date +'%Y-%m-%d %R') AMI configuration completed.\n"
 
 ## Related Scrtipt
 
-### `clean_existing.sh`
+### `script_easy_deploy.sh`
 
 ```sh
 #!/bin/bash
-#Program Name: clean_existing.sh
-#Author name: Wenhao Fang
-#Date Created: Oct 21th 2023
-#Description of the script: Clean up existing files
+# Program Name: script_easy_deploy.sh
+# Author name: Wenhao Fang
+# Date Created: Oct 3rd 2023
+# Date updated: Oct 2nd 2023
+# Description of the script:
+#   Sets up EC2 to deploy django app using user data.
+#   No .env file.
+#   No database connection setup.
 
-sudo rm -rf /home/ubuntu/EC-Django-Deploy/*
-```
+## Updates Linux package
+update_package() {
+    echo -e "$(date +'%Y-%m-%d %R') Update Linux package starts..."
+    DEBIAN_FRONTEND=noninteractive apt-get -y update # update the package on Linux system.
+    # DEBIAN_FRONTEND=noninteractive apt-get -y upgrade # downloads and installs the updates for each outdated package and dependency
+    echo -e "$(date +'%Y-%m-%d %R') Updating Linux package completed.\n"
+}
 
----
+## Establish virtual environment
+setup_venv() {
+    echo -e "$(date +'%Y-%m-%d %R') Install virtual environment package starts..."
+    DEBIAN_FRONTEND=noninteractive apt-get -y install python3-venv # Install pip package
+    # DEBIAN_FRONTEND=noninteractive apt-get -y install virtualenv # Install pip package
+    echo -e "$(date +'%Y-%m-%d %R') Install virtual environment package completed.\n"
 
-### `update_venv_package.sh`
+    echo -e "$(date +'%Y-%m-%d %R') Create Virtual environment starts..."
+    rm -rf /home/ubuntu/env          # remove existing venv
+    python3 -m venv /home/ubuntu/env # Creates virtual environment
+    echo -e "$(date +'%Y-%m-%d %R') Create Virtual environment completed.\n"
+}
 
-```sh
+## Download codes from github
+load_code() {
 
-#!/bin/bash
-#Program Name: update_venv_package.sh
-#Author name: Wenhao Fang
-#Date Created: Oct 21th 2023
-#Description of the script:
-#   Update python package in virtual environment.
+    P_REPO_NAME=$1
+    P_GITHUB_URL=$2
 
-source ~/env/bin/activate # activate venv
-pip install -r /home/ubuntu/EC-Django-Deploy/requirements.txt
-deactivate # deactivate venv
+    echo -e "$(date +'%Y-%m-%d %R') Download codes from github starts..."
+    rm -rf /home/ubuntu/${P_REPO_NAME} # remove the exsting directory
+    cd /home/ubuntu
+    git clone $P_GITHUB_URL # clone codes from github
+    echo -e "$(date +'%Y-%m-%d %R') Download codes from github completed.\n"
+}
 
-```
+## Update packages within venv
+update_venv_package() {
 
----
+    P_REPO_NAME=$1
+    P_PROJECT_NAME=$2
 
-### `setup_gunicorn.sh`
+    echo -e "$(date +'%Y-%m-%d %R') Update venv packages starts..."
+    source /home/ubuntu/env/bin/activate # activate venv
 
-```sh
-#!/bin/bash
-#Program Name: setup_gunicorn.sh
-#Author name: Wenhao Fang
-#Date Created: Oct 21th 2023
-#Description of the script:
-#   Install gunicorn in VEnv
-#   Create gunicorn.socket and gunicorn.service
+    pip install -r /home/ubuntu/${P_REPO_NAME}/requirements.txt
+    echo -e "$(date +'%Y-%m-%d %R') Update venv packages completed.\n"
 
-source ~/env/bin/activate # activate venv
-pip install gunicorn      # install gunicorn
-deactivate                # deactivate venv
+    # logging package list
+    echo -e "\n$(date +'%Y-%m-%d %R') Pip list:" >>/home/ubuntu/setup_log
+    pip list >>/home/ubuntu/setup_log
 
-###########################################################
-## Configuration gunicorn
-## Configuration gunicorn.socket
-###########################################################
-socket_conf=/etc/systemd/system/gunicorn.socket
+    # Migrate App
+    echo -e "$(date +'%Y-%m-%d %R') Migrate App starts..."
+    python3 /home/ubuntu/${P_REPO_NAME}/${P_PROJECT_NAME}/manage.py makemigrations
+    python3 /home/ubuntu/${P_REPO_NAME}/${P_PROJECT_NAME}/manage.py migrate
+    deactivate
+    echo -e "$(date +'%Y-%m-%d %R') Migrate App starts completed.\n"
+}
 
-sudo bash -c "sudo cat >$socket_conf <<SOCK
+## Install and configure Gunicorn
+setup_gunicorn() {
+
+    P_REPO_NAME=$1
+    P_PROJECT_NAME=$2
+
+    # Configuration gunicorn.socket
+    socket_conf=/etc/systemd/system/gunicorn.socket
+
+    cat >$socket_conf <<SOCK
 [Unit]
 Description=gunicorn socket
 
@@ -169,14 +191,13 @@ ListenStream=/run/gunicorn.sock
 
 [Install]
 WantedBy=sockets.target
-SOCK"
+SOCK
+    echo -e "$(date +'%Y-%m-%d %R') gunicorn.socket created."
 
-###########################################################
-## Configuration gunicorn.service
-###########################################################
-service_conf=/etc/systemd/system/gunicorn.service
+    # Configuration gunicorn.service
+    service_conf=/etc/systemd/system/gunicorn.service
 
-sudo bash -c "sudo cat >$service_conf <<SERVICE
+    cat >$service_conf <<SERVICE
 [Unit]
 Description=gunicorn daemon
 Requires=gunicorn.socket
@@ -185,57 +206,51 @@ After=network.target
 [Service]
 User=root
 Group=www-data
-WorkingDirectory=/home/ubuntu/EC-Django-Deploy/CraftyCoders
+WorkingDirectory=/home/ubuntu/${P_REPO_NAME}/${P_PROJECT_NAME}
 ExecStart=/home/ubuntu/env/bin/gunicorn \
     --access-logfile - \
     --workers 3 \
     --bind unix:/run/gunicorn.sock \
-    EC-Django-Deploy.wsgi:application
+    ${P_PROJECT_NAME}.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
-SERVICE"
+SERVICE
+    echo -e "$(date +'%Y-%m-%d %R') gunicorn.socket created."
 
-###########################################################
-## Apply gunicorn configuration
-###########################################################
-sudo systemctl daemon-reload          # reload daemon
-sudo systemctl start gunicorn.socket  # Start gunicorn
-sudo systemctl enable gunicorn.socket # enable on boots
-sudo systemctl restart gunicorn       # restart gunicorn
+    # Apply gunicorn configuration
+    echo -e "$(date +'%Y-%m-%d %R') gunicorn restart.\n"
+    systemctl daemon-reload          # reload daemon
+    systemctl start gunicorn.socket  # Start gunicorn
+    systemctl enable gunicorn.socket # enable on boots
+    systemctl restart gunicorn       # restart gunicorn
 
-```
+    # logging gunicorn status
+    echo -e "$(date +'%Y-%m-%d %R') gunicorn.socket status:" >>/home/ubuntu/setup_log
+    systemctl status gunicorn.socket >>/home/ubuntu/setup_log
+}
 
----
+## Install and configure Nginx
+setup_nginx() {
 
-### `setup_nginx.sh`
+    local P_REPO_NAME=$1
+    local P_PROJECT_NAME=$2
+    local P_HOST_IP=$3
 
-```sh
-#!/bin/bash
-#Program Name: setup_nginx.sh
-#Author name: Wenhao Fang
-#Date Created: Oct 21th 2023
-#Description of the script:
-#   Install nginx package
-#   Create nginx.conf and django.conf
-
-###########################################################
-## Configuration nginx
-###########################################################
-
-# create conf file
-django_conf=/etc/nginx/sites-available/django.conf
-sudo bash -c "cat >$django_conf <<DJANGO_CONF
+    # create conf file
+    echo -e "$(date +'%Y-%m-%d %R') Create conf file."
+    django_conf=/etc/nginx/sites-available/django.conf
+    cat >$django_conf <<DJANGO_CONF
 server {
 listen 80;
-server_name arguswatcher.net www.arguswatcher.net;
+server_name ${P_HOST_IP};
 location = /favicon.ico { access_log off; log_not_found off; }
 location /static/ {
-    root /home/ubuntu/EC-Django-Deploy/CraftyCoders;
+    root /home/ubuntu/${P_REPO_NAME}/${P_PROJECT_NAME};
 }
 
 location /media/ {
-    root /home/ubuntu/EC-Django-Deploy/CraftyCoders;
+    root /home/ubuntu/${P_REPO_NAME}/${P_PROJECT_NAME};
 }
 
 location / {
@@ -243,36 +258,51 @@ location / {
     proxy_pass http://unix:/run/gunicorn.sock;
 }
 }
-DJANGO_CONF"
+DJANGO_CONF
 
-#  Creat link in sites-enabled directory
-sudo ln -sf /etc/nginx/sites-available/django.conf /etc/nginx/sites-enabled
+    #  Creat link in sites-enabled directory
+    echo -e "$(date +'%Y-%m-%d %R') Create link in sites-enabled."
+    ln -sf /etc/nginx/sites-available/django.conf /etc/nginx/sites-enabled
 
-# restart nginx
-sudo nginx -t
-sudo systemctl restart nginx
+    # restart nginx
+    echo -e "$(date +'%Y-%m-%d %R') Nginx restart."
+    systemctl restart nginx
 
-```
+    # logging nginx status
+    echo -e "\n$(date +'%Y-%m-%d %R') Nginx syntax:" >>/home/ubuntu/setup_log
+    nginx -t >>/home/ubuntu/setup_log
 
-### `setup_supervisor.sh`
+    echo -e "\n$(date +'%Y-%m-%d %R') Nginx status:" >>/home/ubuntu/setup_log
+    systemctl daemon-reload # reload daemon
+    systemctl status nginx >>/home/ubuntu/setup_log
+}
 
-```sh
-#!/bin/bash
-#Program Name: setup_supervisor.sh
-#Author name: Wenhao Fang
-#Date Created: Oct 21th 2023
-#Description of the script:
-#   Install supervisor package
-#   Create gunicorn.conf and django.conf
+## Reload Nginx
+reload_nginx() {
+    # relaod nginx
+    systemctl daemon-reload # reload daemon
+    systemctl reload nginx  # reload nginx
 
-###########################################################
-## Configuration supervisor
-###########################################################
-supervisor_gunicorn=/etc/supervisor/conf.d/gunicorn.conf # create configuration file
-sudo bash -c "cat >$supervisor_gunicorn <<SUP_GUN
+    # logging nginx status
+    echo -e "\n$(date +'%Y-%m-%d %R') Nginx reload syntax:" >>/home/ubuntu/setup_log
+    nginx -t >>/home/ubuntu/setup_log
+
+    echo -e "\n$(date +'%Y-%m-%d %R') Nginx reload status:" >>/home/ubuntu/setup_log
+    systemctl status nginx >>/home/ubuntu/setup_log
+}
+
+## Install and configure Supervisor
+setup_supervisor() {
+
+    P_REPO_NAME=$1
+    P_PROJECT_NAME=$2
+
+    echo -e "$(date +'%Y-%m-%d %R') Create gunicorn.conf."
+    supervisor_gunicorn=/etc/supervisor/conf.d/gunicorn.conf # create configuration file
+    cat >$supervisor_gunicorn <<SUP_GUN
 [program:gunicorn]
-    directory=/home/ubuntu/EC-Django-Deploy/CraftyCoders
-    command=/home/ubuntu/env/bin/gunicorn --workers 3 --bind unix:/run/gunicorn.sock  CraftyCoders.wsgi:application
+    directory=/home/ubuntu/${P_REPO_NAME}/${P_PROJECT_NAME}
+    command=/home/ubuntu/env/bin/gunicorn --workers 3 --bind unix:/run/gunicorn.sock  ${P_PROJECT_NAME}.wsgi:application
     autostart=true
     autorestart=true
     stderr_logfile=/var/log/gunicorn/gunicorn.err.log
@@ -280,12 +310,74 @@ sudo bash -c "cat >$supervisor_gunicorn <<SUP_GUN
 
 [group:guni]
     programs:gunicorn
-SUP_GUN"
+SUP_GUN
 
-sudo systemctl daemon-reload
-sudo supervisorctl reread # tell supervisor read configuration file
-sudo supervisorctl update # update supervisor configuration
-sudo supervisorctl reload # Restarted supervisord
+    # Apply configuration.
+    echo -e "$(date +'%Y-%m-%d %R') Reload supervisor."
+    supervisorctl reread # tell supervisor read configuration file >> /home/ubuntu/setup_log
+    supervisorctl update # update supervisor configuration
+    systemctl daemon-reload
+    supervisorctl reload # Restarted supervisord
+
+    # logging supervisor status
+    sleep 5
+    echo -e "\n$(date +'%Y-%m-%d %R') Supervisor status:" >>/home/ubuntu/setup_log
+    supervisorctl status >>/home/ubuntu/setup_log
+}
+
+## Reload Supervisor
+reload_supervisor() {
+    # relaod supervisor
+    systemctl daemon-reload     # reload daemon
+    systemctl reload supervisor # reload supervisor
+
+    # logging supervisor status
+    sleep 5
+    echo -e "\n$(date +'%Y-%m-%d %R') Supervisor status:" >>/home/ubuntu/setup_log
+    supervisorctl status >>/home/ubuntu/setup_log
+}
+
+## Configure script for restart
+config_cloud_restart() {
+
+    echo -e "$(date +'%Y-%m-%d %R') Create cloud config for restart script."
+    cloud_config=/etc/cloud/cloud.cfg.d/cloud-config.cfg # create cloud configuration file
+    cat >$cloud_config <<CLOUD_CONFIG
+#cloud-config
+cloud_final_modules:
+- [scripts-user, always]
+CLOUD_CONFIG
+}
+
+# test
+# P_REPO_NAME=Repo4DjangoEasyDeploy
+# P_PROJECT_NAME=SimpleDjango
+# P_GITHUB_URL=https://github.com/simonangel-fong/Repo4DjangoEasyDeploy.git
+# P_HOST_IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
+
+# production
+P_REPO_NAME=py_repo_name
+P_PROJECT_NAME=py_project_name
+P_GITHUB_URL=py_github_url
+P_HOST_IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
+
+## Download codes from github
+load_code $P_REPO_NAME $P_GITHUB_URL
+
+## Install packages within venv
+update_venv_package $P_REPO_NAME $P_PROJECT_NAME
+
+## Install and configure Gunicorn
+setup_gunicorn $P_REPO_NAME $P_PROJECT_NAME
+
+## Install and configure Nginx
+setup_nginx $P_REPO_NAME $P_PROJECT_NAME $P_HOST_IP
+
+## Install and configure Supervisor
+setup_supervisor $P_REPO_NAME $P_PROJECT_NAME
+
+## Create cloud config, the script will be run each restart.
+config_cloud_restart
 
 ```
 
