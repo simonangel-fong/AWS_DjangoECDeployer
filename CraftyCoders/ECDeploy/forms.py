@@ -45,5 +45,5 @@ class InstanceForm(forms.ModelForm):
             "project_name": forms.TextInput(attrs={"class": "form-control"}),
             "github_url": forms.TextInput(attrs={"class": "form-control"}),
             "domain": forms.TextInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control editor", "rows": "3"}),
         }
