@@ -35,7 +35,7 @@ After=network.target
 [Service]
 User=root
 Group=www-data 
-WorkingDirectory=/home/ubuntu/EC-Django-Deploy
+WorkingDirectory=/home/ubuntu/EC-Django-Deploy/CraftyCoders
 ExecStart=/home/ubuntu/env/bin/gunicorn \
     --access-logfile - \
     --workers 3 \

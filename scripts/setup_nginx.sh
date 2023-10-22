@@ -14,14 +14,14 @@ django_conf=/etc/nginx/sites-available/django.conf
 sudo bash -c "cat >$django_conf <<DJANGO_CONF
 server {
 listen 80;
-server_name 54.167.248.70 EC-Django-Deploy.net www.EC-Django-Deploy.net;
+server_name 54.146.214.123 arguswatcher.net www.arguswatcher.net;
 location = /favicon.ico { access_log off; log_not_found off; }
 location /static/ {
-    root /home/ubuntu/EC-Django-Deploy;
+    root /home/ubuntu/EC-Django-Deploy/CraftyCoders;
 }
 
 location /media/ {
-    root /home/ubuntu/EC-Django-Deploy;
+    root /home/ubuntu/EC-Django-Deploy/CraftyCoders;
 }
 
 location / {

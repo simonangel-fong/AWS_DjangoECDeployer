@@ -1,9 +1,9 @@
-#!/usr/bin/bash 
+#!/usr/bin/bash
 
 cd ~
 source env/bin/activate
-python3 manage.py migrate 
-python3 manage.py makemigrations     
+python3 manage.py migrate
+python3 manage.py makemigrations
 # python3 manage.py collectstatic
 sudo service gunicorn restart
 sudo service nginx restart
@@ -19,3 +19,5 @@ sudo service nginx restart
 # Restart:
 #systemctl restart gunicorn
 #sudo systemctl status nginx
+
+deactivate # deactivate venv
