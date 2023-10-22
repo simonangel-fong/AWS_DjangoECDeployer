@@ -1,0 +1,40 @@
+version: 0.0
+
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/EC-Django-Deploy
+permissions:
+  - object: /home/ubuntu/EC-Django-Deploy
+    owner: ubuntu
+    group: ubuntu
+# 
+hooks:
+  BeforeInstall:
+    - location: scripts/clean_instance.sh
+      timeout: 300
+      runas: ubuntu
+  AfterInstall:
+    - location: scripts/setup_env.sh
+      timeout: 300
+      runas: ubuntu
+    - location: scripts/update_venv_package.sh
+      timeout: 300
+      runas: ubuntu
+    - location: scripts/setup_gunicorn.sh
+      timeout: 300
+      runas: ubuntu
+    - location: scripts/setup_nginx.sh
+      timeout: 300
+      runas: ubuntu
+    - location: scripts/setup_supervisor.sh
+      timeout: 300
+      runas: ubuntu
+  ApplicationStop:
+    - location: scripts/stop_app.sh
+      timeout: 300
+      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/start_app.sh
+      timeout: 300
+      runas: ubuntu

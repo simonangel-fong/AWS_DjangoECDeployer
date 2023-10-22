@@ -1,0 +1,178 @@
+{% extends "layout/base.html" %} {% block main %}
+
+<div class="container">
+  <header class="text-center">
+    <h3 class="h3 pt-4">{{heading}}</h3>
+  </header>
+  <hr class="my-2" />
+  <div class="fliud-container font-monospace">
+    <div class="row g-5 py-4">
+      <div class="col-md-4 col-sm-12">
+        <div class="card h-100">
+          <h4 class="card-header">
+            Server Name:
+            <span id="name" class="fw-bold">{{instance.name}}</span>
+          </h4>
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              Project:
+              <span id="project_name" class="fw-bold">
+                {{instance.project_name}}
+              </span>
+              <a
+                href="{{instance.github_url}}"
+                class="card-link fs-6"
+                target="_blank"
+              >
+                Github
+              </a>
+            </h5>
+            <p class="card-text">
+              Server ID:
+              <span id="instance_id" class="fw-bold">
+                {{instance.instance_id}}
+              </span>
+            </p>
+
+            <p class="card-text">
+              Create Date:
+              <span id="created_date" class="fw-bold">
+                {{instance.created_date|date:"Y-m-d H:i:s " }}
+              </span>
+            </p>
+            <p class="card-text">
+              Pulic IP:
+              <span id="public_ip" class="fw-bold">
+                <!-- public ip -->
+              </span>
+            </p>
+            <p class="card-text">
+              Status:
+              <span id="status" class="fw-bold">
+                <!-- status -->
+              </span>
+            </p>
+            <p class="card-text">
+              Description:
+              <span id="status" class="fw-bold">
+                {{instance.description}}
+              </span>
+            </p>
+            <p>
+              <button
+                id="btn_update_state"
+                type="button"
+                class="btn btn-sm btn-outline-primary rounded-pill align-middle my-2"
+              >
+                <i class="bi bi-arrow-clockwise"></i>
+                Refresh Instance State
+              </button>
+              <button
+                id="btn_update_code"
+                type="button"
+                class="btn btn-sm btn-outline-success rounded-pill align-middle my-2"
+                disabled
+              >
+                <i class="bi bi-cloud-upload"></i>
+                Update Github Code
+              </button>
+            </p>
+            <!-- <a
+              id="btn_stop"
+              href="#"
+              class="btn btn-sm btn-outline-warning rounded-pill me-2"
+              stop_ec2_by_name
+            >
+              Stop Instance
+            </a> -->
+            <hr class="py-2" />
+            <div class="d-flex">
+              <a
+                href="{% url 'ECDeploy:list' %}"
+                class="btn btn-sm btn-outline-secondary rounded-pill me-auto"
+              >
+                Back
+              </a>
+
+              <a
+                href="{% url 'ECDeploy:terminate' instance.pk %}"
+                class="btn btn-sm btn-outline-danger rounded-pill"
+              >
+                Terminate Instance
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8 col-sm-12">
+        <img
+          src="https://miro.medium.com/v2/resize:fit:1100/format:webp/0*wGZaCDK7BVhaKbeW.jpeg"
+          alt=""
+          srcset=""
+        />
+      </div>
+    </div>
+  </div>
+</div>
+{% load static %}
+<script src="{% static 'js/main.js' %}"></script>
+<script>
+  const INFO_URL = "/ec-deploy/info";
+  const UPDATE_CODE_URL = "/ec-deploy/code";
+  const INSTANCE_NAME = "{{instance.name|safe}}";
+
+  /**
+   * Send a request to aws, the request is controled by the url
+   * @param {*} name Instance name
+   * @param {*} url Url defined by django.
+   * @returns The json data returned by django.
+   */
+  const request_ec2_by_name = async (name, url) => {
+    console.log(`${url}/${name}`);
+    const json_data = await fetch(`${url}/${name}`).then((response) =>
+      response.json()
+    );
+    return json_data;
+  };
+
+  /**
+   * Displays instance info in the page
+   * @param {*} data Json data of instance info
+   */
+  function display(data) {
+    if (data["status"] == "success") {
+      data = JSON.parse(data["data"])[0];
+      console.log(data);
+      $("#instance_id").text(data["instance_id"]);
+      if (data["public_ip"]) {
+        $("#public_ip").html(
+          `<a href="http://${data["public_ip"]}" target="_blank">${data["public_ip"]}</a>`
+        );
+      }
+      $("#status").text(data["status"]);
+      if (data["status"] == "running") {
+        $("#status").addClass("text-success");
+      }
+    } else {
+      $("#status").addClass("text-secondary");
+    }
+  }
+
+  // load instance info when document is ready.
+  $(function () {
+    request_ec2_by_name(INSTANCE_NAME, INFO_URL).then((data) => display(data));
+  });
+
+  // load instance info when refresh button is clicked.
+  $("#btn_update_state").click(() => {
+    request_ec2_by_name(INSTANCE_NAME, INFO_URL).then((data) => display(data));
+  });
+
+  // // update codes from github after deployed.
+  // $("#btn_update_code").click(() => {
+  //   request_ec2_by_name(INSTANCE_NAME, UPDATE_CODE_URL).then((data) =>
+  //     console.log(data)
+  //   );
+  // });
+</script>
+{% endblock %}

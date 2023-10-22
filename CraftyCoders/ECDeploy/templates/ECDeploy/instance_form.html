@@ -1,0 +1,88 @@
+{% extends "layout/base.html" %} {% block main %}
+
+<div class="container">
+  <header class="text-center">
+    <h3 class="h3 pt-4">{{heading}}</h3>
+    <p class="lead">
+      This is a demo of deploying a Django web application from Github
+      repository on an AWS EC2 Instance. <br />
+      Django developers only concern on their development and then deploy their project with one click.
+    </p>
+  </header>
+  <hr class="my-2" />
+  {{form.errors}}
+  <div class="container p-4">
+    <form class="row g-4" method="post" novalidate>
+      {% csrf_token %}
+      <h4 class="mb-3">Server and Django Project Configuration</h4>
+
+      <!-- name -->
+      <div class="col-md-5 col-sm-12">
+        <label class="form-label" for="{{ form.name.id_for_label }}">
+          {{form.name.label}}
+        </label>
+        {{form.name}}
+        <small class="form-text">Hint: {{form.name.help_text}} </small>
+        <small class="text-danger"> {{form.name.errors}} </small>
+      </div>
+
+      <!-- project_name -->
+      <div class="col-md-6 col-sm-12">
+        <label class="form-label" for="{{ form.project_name.id_for_label }}">
+          {{form.project_name.label}}
+        </label>
+        {{form.project_name}}
+        <small class="form-text">Hint: {{form.project_name.help_text}} </small>
+        <small class="text-danger"> {{form.project_name.errors}} </small>
+      </div>
+
+      <!-- github_url -->
+      <div class="col-md-8 col-sm-12">
+        <label class="form-label" for="{{ form.github_url.id_for_label }}">
+          {{form.github_url.label}}
+        </label>
+        {{form.github_url}}
+        <small class="form-text">Hint: {{form.github_url.help_text}} </small>
+        <small class="text-danger"> {{form.github_url.errors}} </small>
+      </div>
+
+      <!-- description -->
+      <div class="col-md-12 col-sm-12">
+        <label
+          class="form-label col-12"
+          for="{{ form.github_url.id_for_label }}"
+        >
+          {{form.description.label}}
+        </label>
+        {{form.description}}
+        <small class="form-text">Hint: {{form.description.help_text}} </small>
+        <small class="text-danger"> {{form.description.errors}} </small>
+      </div>
+
+      <hr class="my-4" />
+
+      <h4 class="mb-3">MySQL Configuration (Comming soon)</h4>
+
+      <hr class="my-4" />
+
+      <div class="d-flex py-2">
+        <a
+          class="btn btn-outline-secondary rounded-pill me-auto"
+          href="{% url 'ECDeploy:list' %}"
+        >
+          Back
+        </a>
+        <button
+          class="btn btn-outline-secondary rounded-pill mx-2"
+          type="reset"
+        >
+          Reset
+        </button>
+        <button class="btn btn-outline-primary rounded-pill mx-2" type="submit">
+          Create
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
