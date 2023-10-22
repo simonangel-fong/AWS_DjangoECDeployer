@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #Program Name: clean_existing.sh
 #Author name: Wenhao Fang
 #Date Created: Oct 21th 2023

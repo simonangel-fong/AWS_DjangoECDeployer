@@ -64,25 +64,28 @@ class InstanceCreateView(SuccessMessageMixin, CreateView):
 
             )
 
-            # Generates bash script based on given parameters.
-            user_data = read_user_data_script(
-                SCRIPT_PATH,
-                form.cleaned_data["project_name"],
-                form.cleaned_data["github_url"],
-            )
+            try:
+                # Generates bash script based on given parameters.
+                user_data = read_user_data_script(
+                    SCRIPT_PATH,
+                    form.cleaned_data["project_name"],
+                    form.cleaned_data["github_url"],
+                )
 
-            # Creates an new EC2 instance
-            ec2 = create_instance_by_template(
-                EC2_TEMPLATE,
-                form.cleaned_data["name"],
-                user_data
-            )
+                # Creates an new EC2 instance
+                ec2 = create_instance_by_template(
+                    EC2_TEMPLATE,
+                    form.cleaned_data["name"],
+                    user_data
+                )
 
-            # get the instance id when it is created
-            obj.instance_id = ec2[0]["instance_id"]
+                # get the instance id when it is created
+                obj.instance_id = ec2[0]["instance_id"]
 
-            # update the instance id with record
-            obj.save()
+                # update the instance id with record
+                obj.save()
+            except Exception as err:
+                print(f"{err}")
 
             # redirect to the detail page
             return redirect("ECDeploy:detail", pk=obj.pk)
@@ -138,7 +141,10 @@ class InstanceTerminateView(SuccessMessageMixin, DeleteView):
 
     def form_valid(self, form):
         # if valid, calls terminate function.
-        terminate_instance_by_name((self.object.name,))
+        try:
+            terminate_instance_by_name((self.object.name,))
+        except Exception as err:
+            print(f"{err}")
         return super().form_valid(form)
 
 

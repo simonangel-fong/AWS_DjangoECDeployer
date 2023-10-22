@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 #Program Name: start_app.sh
 #Author name: Wenhao Fang
 #Date Created: Oct 21th 2023
