@@ -24,7 +24,10 @@ def read_user_data_script(script_path, project_name, github_url, mysql_user=None
 def list_all_instance():
     ''' Lists all running instances. '''
 
-    ec2 = boto3.resource('ec2')
+    ec2 = boto3.resource(
+        service_name='ec2',
+        region_name='us-east-1'
+    )
     filters = [
         {
             "Name": "instance-state-name",
@@ -54,7 +57,10 @@ def list_all_instance():
 def list_instance_by_name(name_list):
     ''' Lists running or stopped instances within a name list. '''
 
-    ec2 = boto3.resource('ec2')
+    ec2 = boto3.resource(
+        service_name='ec2',
+        region_name='us-east-1'
+    )
     filters = [
         {
             'Name': 'instance-state-name',
@@ -91,7 +97,10 @@ def create_instance_by_template(launch_template_name, instance_name=None, user_d
     if launch_template_name == None:
         raise ValueError("Parameter launch_template_name is required.")
     else:
-        ec2 = boto3.resource('ec2')
+        ec2 = boto3.resource(
+            service_name='ec2',
+            region_name='us-east-1'
+        )
         ec2_list = ec2.create_instances(
             # launch template
             LaunchTemplate={
