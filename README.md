@@ -13,18 +13,17 @@ Team Name: CraftyCoders
   - Pipline
   
 - AWS Optimize
-  - 1. Craete account:
+  - [x] Craete account: EC Deploy Admin
     - Create temp IAM key
     - EC Deploy Admin
   
-  - 2. AWS AMI
+  - [x] AWS AMI
     - Ubuntu
     - install package
       - gunicorn
       - nginx
       - supervisor
     - Snapshot
-
 
 - App:
   - update script: user data

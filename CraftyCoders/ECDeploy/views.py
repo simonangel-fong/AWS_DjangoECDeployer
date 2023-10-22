@@ -19,7 +19,7 @@ SCRIPT_PATH = Path(
     "script",
     "script_easy_deploy.sh"
 )
-EC2_TEMPLATE = "Ubuntu_GP_Template"
+EC2_TEMPLATE = "EC-Deploy-Template"
 
 
 class InstanceListView(ListView):

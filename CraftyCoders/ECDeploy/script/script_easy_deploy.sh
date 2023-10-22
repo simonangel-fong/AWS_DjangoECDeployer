@@ -72,13 +72,6 @@ setup_gunicorn() {
     P_REPO_NAME=$1
     P_PROJECT_NAME=$2
 
-    #  Install gunicorn in venv
-    echo -e "$(date +'%Y-%m-%d %R') Install gunicorn starts..."
-    source /home/ubuntu/env/bin/activate # activate venv
-    pip install gunicorn                 # install gunicorn
-    deactivate                           # deactivate venv
-    echo -e "$(date +'%Y-%m-%d %R') Install gunicorn completed.\n"
-
     # Configuration gunicorn.socket
     socket_conf=/etc/systemd/system/gunicorn.socket
 
@@ -136,16 +129,6 @@ setup_nginx() {
     local P_REPO_NAME=$1
     local P_PROJECT_NAME=$2
     local P_HOST_IP=$3
-
-    # Install nginx
-    echo -e "$(date +'%Y-%m-%d %R') Install nginx starts."
-    DEBIAN_FRONTEND=noninteractive apt-get -y install nginx # install nginx
-    echo -e "$(date +'%Y-%m-%d %R') Install nginx completed.\n"
-
-    # overwrites user
-    echo -e "$(date +'%Y-%m-%d %R') Overwrite nginx.conf."
-    nginx_conf=/etc/nginx/nginx.conf
-    sed -i '1cuser root;' $nginx_conf
 
     # create conf file
     echo -e "$(date +'%Y-%m-%d %R') Create conf file."
@@ -206,14 +189,6 @@ setup_supervisor() {
 
     P_REPO_NAME=$1
     P_PROJECT_NAME=$2
-
-    # Install supervisor
-    echo -e "$(date +'%Y-%m-%d %R') Install supervisor starts."
-    DEBIAN_FRONTEND=noninteractive apt-get -y install supervisor # install supervisor
-    echo -e "$(date +'%Y-%m-%d %R') Install supervisor completed.\n"
-
-    # create directory for echo -e
-    mkdir -p /var/log/gunicorn
 
     echo -e "$(date +'%Y-%m-%d %R') Create gunicorn.conf."
     supervisor_gunicorn=/etc/supervisor/conf.d/gunicorn.conf # create configuration file
@@ -278,12 +253,6 @@ P_REPO_NAME=py_repo_name
 P_PROJECT_NAME=py_project_name
 P_GITHUB_URL=py_github_url
 P_HOST_IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
-
-## Update OS
-update_package
-
-## Establish virtual environment
-setup_venv
 
 ## Download codes from github
 load_code $P_REPO_NAME $P_GITHUB_URL
