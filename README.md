@@ -3,23 +3,31 @@ A repository of a project to deploy Django web application using AWS services.
 
 Team Name: CraftyCoders
 
-- Dedicated server
+- [x] Dedicated server
   - Load balancing
   - Route53 alias
 
-- CICD:
-  - 1. AWS AMI
+- [x] CICD:
+  - Build
+  - Deploy
+  - Pipline
+  
+- AWS Optimize
+  - 1. Craete account:
+    - Create temp IAM key
+    - EC Deploy Admin
+  
+  - 2. AWS AMI
     - Ubuntu
     - install package
+      - gunicorn
       - nginx
       - supervisor
     - Snapshot
 
-  - 2. Build + Pipline
-  - 3. Create temp IAM key
-  - 4. setup Server
 
 - App:
+  - update script: user data
   - Admin account
   - Login required
   
