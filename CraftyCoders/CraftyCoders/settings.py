@@ -9,7 +9,7 @@ env = Env(
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # read the env file from the base dir
-env.read_env(Path(Path(BASE_DIR).parent, '.env'))
+env.read_env(Path(Path(BASE_DIR).parent.parent, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -75,11 +75,11 @@ DATABASES = {
     # overrides the default db
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
+        'NAME': env("DATABASE"),
+        'USER': env("USER"),
+        'PASSWORD': env("PASSWORD"),
+        'HOST': env("HOST"),
+        'PORT': 3306,
         'OPTIONS': {
             # used to handle the invalid or missing values from being stored in the database by INSERT and UPDATE statements.
             # STRICT_TRANS_TABLES mode: If a value could not be inserted as given into a transactional table, abort the statement.

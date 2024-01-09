@@ -25,13 +25,8 @@ class InstanceListView(LoginRequiredMixin, ListView):
     ''' A view to list all EC2 instances '''
 
     model = Instance
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        print(context)
-        context["title"] = "Django-EC2 Deployment"
-        context["heading"] = "All Running EC2 Instances"
-        return context
+    extra_context = {"title": "Django-EC2 Deployment",
+                     "heading": "All Running EC2 Instances"}
 
 
 class InstanceCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -42,12 +37,8 @@ class InstanceCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     # success_url = reverse_lazy("ECDeploy:success")
     success_message = 'Instance "%(name)s" was created successfully. Waiting for AWS to response.'
     template_name = "ECDeploy/instance_form.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Create new EC2 Instance"
-        context["heading"] = "Django Easy Deployment"
-        return context
+    extra_context = {"title": "Create new EC2 Instance",
+                     "heading": "Django Easy Deployment"}
 
     def post(self, request, *args, **kwargs):
 
@@ -60,7 +51,6 @@ class InstanceCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
                 github_url=form.cleaned_data["github_url"],
                 project_name=form.cleaned_data["project_name"],
                 description=form.cleaned_data["description"],
-
             )
 
             # try:
@@ -96,25 +86,16 @@ class SuccessView(LoginRequiredMixin, TemplateView):
     ''' A view to display success message. '''
 
     template_name = "ECDeploy/success.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Success"
-        context["heading"] = "Success"
-        return context
+    extra_context = {"title": "Success",
+                     "heading": "Success"}
 
 
 class InstanceDetailView(LoginRequiredMixin, DetailView):
     ''' A view for details of a specified instance '''
 
     model = Instance
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # ec2_list = list_instance_by_name((self.object.name,)) # may not required if using js to refresh state
-        context["title"] = "EC2 Instance Detail Info"
-        context["heading"] = "EC2 Instance Detail"
-        return context
+    extra_context = {"title": "EC2 Instance Detail Info",
+                     "heading": "EC2 Instance Detail"}
 
 
 class InstanceTerminateView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
@@ -124,13 +105,8 @@ class InstanceTerminateView(LoginRequiredMixin, SuccessMessageMixin, DeleteView)
     success_url = reverse_lazy("ECDeploy:success")
     # define a success message to display
     success_message = 'Instance "%(name)s" was terminated successfully. Waiting for AWS to response.'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # title and heading for delete confirm page.
-        context["title"] = "Terminate EC2 Instance"
-        context["heading"] = "Terminate EC2 Instance"
-        return context
+    extra_context = {"title": "Terminate EC2 Instance",
+                     "heading": "Terminate EC2 Instance"}
 
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(
@@ -159,13 +135,13 @@ def get_instance_info(request, instance_name):
         return JsonResponse({'status': 'error', 'error': ex}, status=404)
 
 
-def get_all_instance_info(request, instance_name):
-    ''' A Json response to retrieve all instances info '''
+# def get_all_instance_info(request, instance_name):
+#     ''' A Json response to retrieve all instances info '''
 
-    try:
-        print(instance_name)
-        ec2_list = list_all_instance()
-        print(ec2_list)
-        return JsonResponse({'status': 'success', 'data': json.dumps(ec2_list)}, status=200)
-    except Exception as ex:
-        return JsonResponse({'status': 'error', 'error': ex}, status=404)
+#     try:
+#         print(instance_name)
+#         ec2_list = list_all_instance()
+#         print(ec2_list)
+#         return JsonResponse({'status': 'success', 'data': json.dumps(ec2_list)}, status=200)
+#     except Exception as ex:
+#         return JsonResponse({'status': 'error', 'error': ex}, status=404)
