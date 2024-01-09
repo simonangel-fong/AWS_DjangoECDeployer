@@ -3,9 +3,9 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu/EC-Django-Deploy
+    destination: /home/ubuntu/AWS_EC2_ECDjangoDeploy
 permissions:
-  - object: /home/ubuntu/EC-Django-Deploy
+  - object: /home/ubuntu/AWS_EC2_ECDjangoDeploy
     owner: ubuntu
     group: ubuntu
 # 

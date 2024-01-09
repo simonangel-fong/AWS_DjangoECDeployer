@@ -6,5 +6,5 @@
 #   Update python package in virtual environment.
 
 source ~/env/bin/activate # activate venv
-pip install -r /home/ubuntu/EC-Django-Deploy/requirements.txt
+pip install -r /home/ubuntu/AWS_EC2_ECDjangoDeploy/requirements.txt
 deactivate # deactivate venv

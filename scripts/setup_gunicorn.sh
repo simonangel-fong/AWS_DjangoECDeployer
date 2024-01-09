@@ -41,12 +41,12 @@ After=network.target
 [Service]
 User=root
 Group=www-data 
-WorkingDirectory=/home/ubuntu/EC-Django-Deploy/CraftyCoders
+WorkingDirectory=/home/ubuntu/AWS_EC2_ECDjangoDeploy/CraftyCoders
 ExecStart=/home/ubuntu/env/bin/gunicorn \
     --access-logfile - \
     --workers 3 \
     --bind unix:/run/gunicorn.sock \
-    EC-Django-Deploy.wsgi:application
+    CraftyCoders.wsgi:application
 
 [Install]
 WantedBy=multi-user.target

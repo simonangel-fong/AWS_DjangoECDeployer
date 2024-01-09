@@ -1,4 +1,4 @@
-# EC-Django-Deploy
+# CraftyCoders
 
 A repository of a project to deploy Django web application using AWS services.
 

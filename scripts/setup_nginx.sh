@@ -23,11 +23,11 @@ listen 80;
 server_name arguswatcher.net www.arguswatcher.net;
 location = /favicon.ico { access_log off; log_not_found off; }
 location /static/ {
-    root /home/ubuntu/EC-Django-Deploy/CraftyCoders;
+    root /home/ubuntu/AWS_EC2_ECDjangoDeploy/CraftyCoders;
 }
 
 location /media/ {
-    root /home/ubuntu/EC-Django-Deploy/CraftyCoders;
+    root /home/ubuntu/AWS_EC2_ECDjangoDeploy/CraftyCoders;
 }
 
 location / {
