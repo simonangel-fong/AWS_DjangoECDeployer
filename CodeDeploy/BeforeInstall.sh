@@ -9,21 +9,21 @@
 #   script of before installation
 
 # Create the CICD log
-rm -rf Deploy_BeforeInstall.log
+sudo rm -rf Deploy_BeforeInstall.log
 touch /home/ubuntu/Deploy_BeforeInstall.log
 
 # log start cicd BeforeInstall
-echo -e "$(date +'%Y-%m-%d %H:%M:%S') CodeDeploy BeforeInstall starting..." >>/home/ubuntu/Deploy_BeforeInstall.log
+sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') CodeDeploy BeforeInstall starting..." >>/home/ubuntu/Deploy_BeforeInstall.log
 
 # remove the existing env, since each push might have different packages within env
 sudo rm -rf /home/ubuntu/env &&
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') ENV - Remove existing env." >>/home/ubuntu/Deploy_BeforeInstall.log ||
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: ENV - Remove existing env." >>/home/ubuntu/Deploy_BeforeInstall.log
+    sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') ENV - Remove existing env." >>/home/ubuntu/Deploy_BeforeInstall.log ||
+    sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: ENV - Remove existing env." >>/home/ubuntu/Deploy_BeforeInstall.log
 
 # remove the existing repo
 sudo rm -rf /home/ubuntu/AWS_EC2_ECDjangoDeploy &&
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') ENV - Remove existing env." >>/home/ubuntu/Deploy_BeforeInstall.log ||
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: ENV - Remove existing env." >>/home/ubuntu/Deploy_BeforeInstall.log
+    sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') ENV - Remove existing env." >>/home/ubuntu/Deploy_BeforeInstall.log ||
+    sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: ENV - Remove existing env." >>/home/ubuntu/Deploy_BeforeInstall.log
 
 # log complete cicd BeforeInstall
-echo -e "$(date +'%Y-%m-%d %H:%M:%S') CodeDeploy BeforeInstall completed." >>/home/ubuntu/Deploy_BeforeInstall.log
+sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') CodeDeploy BeforeInstall completed." >>/home/ubuntu/Deploy_BeforeInstall.log

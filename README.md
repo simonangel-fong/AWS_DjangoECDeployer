@@ -65,7 +65,7 @@
 
 ## Diagram
 
-![diagram](./doc/pic/diagram.png)
+![diagram](./pic/diagram.png)
 
 - **EC Django Deployer CICD Workflow**:
 
