@@ -7,7 +7,6 @@
 # Project: EC_Django_Deployer
 # Description of the script:
 #   script of after installation
-#   as user ubuntu
 
 # create log file
 sudo rm -rf /home/ubuntu/Deploy_AfterInstall.log

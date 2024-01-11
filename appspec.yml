@@ -19,7 +19,7 @@ hooks:
       timeout: 300
       runas: root
   ApplicationStop:
-    - location: scripts/stop_app.sh
+    - location: CodeDeploy/ApplicationStop.sh
       timeout: 300
       runas: ubuntu
   ApplicationStart:

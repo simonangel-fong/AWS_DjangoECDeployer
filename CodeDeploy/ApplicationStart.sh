@@ -7,7 +7,6 @@
 # Project: EC_Django_Deployer
 # Description of the script:
 #   script of ApplicationStart
-#   as user ubuntu
 
 # create ApplicationStart log/
 sudo rm -rf /home/ubuntu/Deploy_ApplicationStart.log

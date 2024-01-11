@@ -6,7 +6,7 @@
 # Repo: AWS_EC2_ECDjangoDeploy
 # Project: EC_Django_Deployer
 # Description of the script:
-#   script of before installation
+#   script of BeforeInstall
 
 # Create the CICD log
 rm -rf Deploy_BeforeInstall.log
