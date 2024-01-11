@@ -97,11 +97,11 @@ listen 80;
 server_name $(curl -s https://api.ipify.org);
 location = /favicon.ico { access_log off; log_not_found off; }
 location /static/ {
-    root /home/ubuntu/AWS_EC2_ECDjangoDeploy/demoDjango;
+    root /home/ubuntu/AWS_EC2_ECDjangoDeploy/EC_Django_Deployer;
 }
 
 location /media/ {
-    root /home/ubuntu/AWS_EC2_ECDjangoDeploy/demoDjango;
+    root /home/ubuntu/AWS_EC2_ECDjangoDeploy/EC_Django_Deployer;
 }
 
 location / {
@@ -130,8 +130,8 @@ sudo mkdir -p /var/log/gunicorn
 # create configuration file
 sudo bash -c "cat >/etc/supervisor/conf.d/gunicorn.conf  <<SUP_GUN
 [program:gunicorn]
-    directory=/home/ubuntu/AWS_EC2_ECDjangoDeploy/demoDjango
-    command=/home/ubuntu/env/bin/gunicorn --workers 3 --bind unix:/run/gunicorn.sock  demoDjango.wsgi:application
+    directory=/home/ubuntu/AWS_EC2_ECDjangoDeploy/EC_Django_Deployer
+    command=/home/ubuntu/env/bin/gunicorn --workers 3 --bind unix:/run/gunicorn.sock  EC_Django_Deployer.wsgi:application
     autostart=true
     autorestart=true
     stderr_logfile=/var/log/gunicorn/gunicorn.err.log
@@ -151,20 +151,22 @@ sudo supervisorctl reload # Restarted supervisord
 ###########################################################
 ## Django Migrate
 ###########################################################
+source /home/ubuntu/env/bin/activate
 # django make migrations
-python3 manage.py makemigrations &&
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Django - make migrations." >>/home/ubuntu/provision.log ||
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Django - make migrations." >>/home/ubuntu/provision.log
+sudo bash -c "python3 /home/ubuntu/AWS_EC2_ECDjangoDeploy/EC_Django_Deployer/manage.py makemigrations" &&
+    sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') Django - make migrations." >>/home/ubuntu/provision.log ||
+    sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Django - make migrations." >>/home/ubuntu/provision.log
 
 # django migrate
-python3 manage.py migrate &&
+python3 /home/ubuntu/AWS_EC2_ECDjangoDeploy/EC_Django_Deployer/manage.py migrate &&
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Django - migrate." >>/home/ubuntu/provision.log ||
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Django - migrate." >>/home/ubuntu/provision.log
 
 # django collect static files
-python3 manage.py collectstatic &&
+python3 /home/ubuntu/AWS_EC2_ECDjangoDeploy/EC_Django_Deployer/manage.py collectstatic &&
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Django - collect static files." >>/home/ubuntu/provision.log ||
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Django - collect static files." >>/home/ubuntu/provision.log
+deactivate
 
 # restart gunicorn
 sudo service gunicorn restart &&

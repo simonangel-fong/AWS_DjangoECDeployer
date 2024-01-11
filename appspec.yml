@@ -21,8 +21,8 @@ hooks:
   ApplicationStop:
     - location: CodeDeploy/ApplicationStop.sh
       timeout: 300
-      runas: ubuntu
+      runas: root
   ApplicationStart:
     - location: CodeDeploy/ApplicationStart.sh
       timeout: 300
-      runas: ubuntu
+      runas: root
