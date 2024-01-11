@@ -13,7 +13,7 @@ hooks:
   BeforeInstall:
     - location: CodeDeploy/BeforeInstall.sh
       timeout: 300
-      runas: ubuntu
+      runas: root
   AfterInstall:
     - location: CodeDeploy/AfterInstall.sh
       timeout: 300
