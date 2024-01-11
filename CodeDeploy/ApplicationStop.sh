@@ -7,3 +7,5 @@
 # Project: EC_Django_Deployer
 # Description of the script:
 #   script of ApplicationStop
+
+touch /home/ubuntu/ApplicationStop.log
