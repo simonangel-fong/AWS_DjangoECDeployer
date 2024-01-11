@@ -46,7 +46,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'CraftyCoders.urls'
+ROOT_URLCONF = 'EC_Django_Deployer.urls'
 
 TEMPLATES = [
     {
@@ -64,7 +64,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'CraftyCoders.wsgi.application'
+WSGI_APPLICATION = 'EC_Django_Deployer.wsgi.application'
 
 
 # Database
@@ -119,7 +119,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 STATIC_ROOT = 'static'  # collectstatic
-STATICFILES_DIRS = [Path(BASE_DIR, 'CraftyCoders/static')]
+STATICFILES_DIRS = [Path(BASE_DIR, 'EC_Django_Deployer/static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

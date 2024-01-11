@@ -8,26 +8,14 @@ permissions:
   - object: /home/ubuntu/AWS_EC2_ECDjangoDeploy
     owner: ubuntu
     group: ubuntu
-# 
+#
 hooks:
   BeforeInstall:
-    - location: scripts/clean_existing.sh
+    - location: CodeDeploy/BeforeInstall.sh
       timeout: 300
       runas: ubuntu
   AfterInstall:
-    - location: scripts/setup_env.sh
-      timeout: 300
-      runas: ubuntu
-    - location: scripts/update_venv_package.sh
-      timeout: 300
-      runas: ubuntu
-    - location: scripts/setup_gunicorn.sh
-      timeout: 300
-      runas: ubuntu
-    - location: scripts/setup_nginx.sh
-      timeout: 300
-      runas: ubuntu
-    - location: scripts/setup_supervisor.sh
+    - location: CodeDeploy/AfterInstall.sh
       timeout: 300
       runas: ubuntu
   ApplicationStop:
@@ -35,6 +23,6 @@ hooks:
       timeout: 300
       runas: ubuntu
   ApplicationStart:
-    - location: scripts/start_app.sh
+    - location: CodeDeploy/ApplicationStart.sh
       timeout: 300
       runas: ubuntu

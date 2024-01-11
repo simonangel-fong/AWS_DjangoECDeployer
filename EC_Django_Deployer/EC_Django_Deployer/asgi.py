@@ -1,5 +1,5 @@
 """
-ASGI config for CraftyCoders project.
+ASGI config for EC_Django_Deployer project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CraftyCoders.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'EC_Django_Deployer.settings')
 
 application = get_asgi_application()
