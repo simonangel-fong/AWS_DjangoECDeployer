@@ -10,7 +10,7 @@
 
 # Create the CICD log
 rm -rf Deploy_BeforeInstall.log
-sudo touch /home/ubuntu/Deploy_BeforeInstall.log
+touch /home/ubuntu/Deploy_BeforeInstall.log
 
 # log start cicd BeforeInstall
 echo -e "$(date +'%Y-%m-%d %H:%M:%S') CodeDeploy BeforeInstall starting..." >>/home/ubuntu/Deploy_BeforeInstall.log
