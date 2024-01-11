@@ -3,6 +3,8 @@
 # Author name: Wenhao Fang
 # Date Created: Oct 21th 2023
 # Date Created: Jan 10th 2024
+# Repo: AWS_EC2_ECDjangoDeploy
+# Project: EC_Django_Deployer
 # Description of the script:
 #   user data script to deploy a django project
 
@@ -14,12 +16,12 @@ touch /home/ubuntu/provision.log
 ## Clone github repo
 ###########################################################
 # remove existings github repo dir
-sudo rm -rf /home/ubuntu/Django_Simple_CRUD/
+sudo rm -rf /home/ubuntu/AWS_EC2_ECDjangoDeploy/
 # create dir for github repo
-mkdir /home/ubuntu/Django_Simple_CRUD/
+mkdir /home/ubuntu/AWS_EC2_ECDjangoDeploy/
 
 # clone github repo
-git clone https://github.com/simonangel-fong/Django_Simple_CRUD.git /home/ubuntu/Django_Simple_CRUD &&
+git clone https://github.com/simonangel-fong/AWS_EC2_ECDjangoDeploy.git /home/ubuntu/AWS_EC2_ECDjangoDeploy &&
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Git - Clone github repo." >>/home/ubuntu/provision.log ||
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Git - Clone github repo." >>/home/ubuntu/provision.log
 
@@ -27,7 +29,7 @@ git clone https://github.com/simonangel-fong/Django_Simple_CRUD.git /home/ubuntu
 ## Update project dependencies
 ###########################################################
 source /home/ubuntu/env/bin/activate
-pip install -r /home/ubuntu/Django_Simple_CRUD/requirements.txt &&
+pip install -r /home/ubuntu/AWS_EC2_ECDjangoDeploy/requirements.txt &&
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Pip - Install project dependencies." >>/home/ubuntu/provision.log ||
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Pip - Install project dependencies." >>/home/ubuntu/provision.log
 deactivate
@@ -58,12 +60,12 @@ After=network.target
 [Service]
 User=root
 Group=www-data 
-WorkingDirectory=/home/ubuntu/project_dir
+WorkingDirectory=/home/ubuntu/EC_Django_Deployer
 ExecStart=/home/ubuntu/env/bin/gunicorn \
     --access-logfile - \
     --workers 3 \
     --bind unix:/run/gunicorn.sock \
-    project_dir.wsgi:application
+    EC_Django_Deployer.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
@@ -95,11 +97,11 @@ listen 80;
 server_name $(curl -s https://api.ipify.org);
 location = /favicon.ico { access_log off; log_not_found off; }
 location /static/ {
-    root /home/ubuntu/Django_Simple_CRUD/demoDjango;
+    root /home/ubuntu/AWS_EC2_ECDjangoDeploy/demoDjango;
 }
 
 location /media/ {
-    root /home/ubuntu/Django_Simple_CRUD/demoDjango;
+    root /home/ubuntu/AWS_EC2_ECDjangoDeploy/demoDjango;
 }
 
 location / {
@@ -128,7 +130,7 @@ sudo mkdir -p /var/log/gunicorn
 # create configuration file
 sudo bash -c "cat >/etc/supervisor/conf.d/gunicorn.conf  <<SUP_GUN
 [program:gunicorn]
-    directory=/home/ubuntu/Django_Simple_CRUD/demoDjango
+    directory=/home/ubuntu/AWS_EC2_ECDjangoDeploy/demoDjango
     command=/home/ubuntu/env/bin/gunicorn --workers 3 --bind unix:/run/gunicorn.sock  demoDjango.wsgi:application
     autostart=true
     autorestart=true
