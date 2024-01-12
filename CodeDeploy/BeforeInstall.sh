@@ -19,7 +19,7 @@ if [ -f "/home/ubuntu/log/deploy.log" ]; then
 fi
 
 # Create a new log file
-touch "/home/ubuntu/log/deploy.log"
+sudo touch "/home/ubuntu/log/deploy.log"
 
 # Log start CICD BeforeInstall
 echo -e "$(date +'%Y-%m-%d %H:%M:%S') CodeDeploy BeforeInstall starting..." >>"/home/ubuntu/log/deploy.log"
