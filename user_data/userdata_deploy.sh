@@ -61,12 +61,20 @@ git clone https://github.com/simonangel-fong/AWS_ECDjangoDeployer.git /home/ubun
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Git - Clone github repo." >>/home/ubuntu/log/deploy.log
 
 ###########################################################
-## Install gunicorn package within venv
+## Creates virtual environment
 ###########################################################
-# Creates virtual environment
 python3 -m venv /home/ubuntu/env &&
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') VENV - Create virtual environment." >>"/home/ubuntu/log/deploy.log" ||
     echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: VENV - Create virtual environment." >>"/home/ubuntu/log/deploy.log"
+
+###########################################################
+## Install gunicorn package within venv
+###########################################################
+source /home/ubuntu/env/bin/activate
+pip install gunicorn &&
+    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Gunicorn - Install gunicorn." >>/home/ubuntu/log/deploy.log ||
+    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Gunicorn - Install gunicorn." >>/home/ubuntu/log/deploy.log
+deactivate
 
 ###########################################################
 ## Update project dependencies
