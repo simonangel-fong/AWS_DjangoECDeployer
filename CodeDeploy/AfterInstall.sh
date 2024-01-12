@@ -95,11 +95,11 @@ listen 80;
 server_name $(curl -s https://api.ipify.org);
 location = /favicon.ico { access_log off; log_not_found off; }
 location /static/ {
-    root /home/ubuntu/AWS_ECDjangoDeployer/EC_Django_Deployer
+    root /home/ubuntu/AWS_ECDjangoDeployer/EC_Django_Deployer;
 }
 
 location /media/ {
-    root /home/ubuntu/AWS_ECDjangoDeployer/EC_Django_Deployer
+    root /home/ubuntu/AWS_ECDjangoDeployer/EC_Django_Deployer;
 }
 
 location / {
@@ -145,35 +145,6 @@ sudo systemctl daemon-reload
 sudo supervisorctl reread # tell supervisor read configuration file
 sudo supervisorctl update # update supervisor configuration
 sudo supervisorctl reload # Restarted supervisord
-
-###########################################################
-## Django Migrate
-###########################################################
-source /home/ubuntu/env/bin/activate
-# django make migrations
-python3 /home/ubuntu/AWS_EC2_ECDjangoDeploy/EC_Django_Deployer/manage.py makemigrations &&
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Django - make migrations." >>"/home/ubuntu/log/deploy.log" ||
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Django - make migrations." >>"/home/ubuntu/log/deploy.log"
-
-# django migrate
-python3 /home/ubuntu/AWS_EC2_ECDjangoDeploy/EC_Django_Deployer/manage.py migrate &&
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Django - migrate." >>"/home/ubuntu/log/deploy.log" ||
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Django - migrate." >>"/home/ubuntu/log/deploy.log"
-
-# django collect static files
-python3 /home/ubuntu/AWS_EC2_ECDjangoDeploy/EC_Django_Deployer/manage.py collectstatic &&
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Django - collect static files." >>"/home/ubuntu/log/deploy.log" ||
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Django - collect static files." >>"/home/ubuntu/log/deploy.log"
-
-# restart gunicorn
-sudo service gunicorn restart &&
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Gunicorn - restart service." >>"/home/ubuntu/log/deploy.log" ||
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Gunicorn - restart service." >>"/home/ubuntu/log/deploy.log"
-
-# restart nginx
-sudo service nginx restart &&
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Nginx - restart service." >>"/home/ubuntu/log/deploy.log" ||
-    echo -e "$(date +'%Y-%m-%d %H:%M:%S') Fail: Nginx - restart service." >>"/home/ubuntu/log/deploy.log"
 
 # log finish deployment
 echo -e "$(date +'%Y-%m-%d %H:%M:%S') CodeDeploy AfterInstall completed." >>"/home/ubuntu/log/deploy.log"
