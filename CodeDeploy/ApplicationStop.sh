@@ -8,4 +8,7 @@
 # Description of the script:
 #   script of ApplicationStop
 
-touch /home/ubuntu/ApplicationStop.log
+sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') CodeDeploy ApplicationStop starting..." >>/home/ubuntu/log/deploy.log
+
+sudo echo -e "$(date +'%Y-%m-%d %H:%M:%S') ApplicationStop completed." >>/home/ubuntu/log/deploy.log
+sudo echo -e " " >>/home/ubuntu/log/deploy.log
