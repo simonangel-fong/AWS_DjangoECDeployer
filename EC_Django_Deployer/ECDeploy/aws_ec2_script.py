@@ -13,10 +13,13 @@ def read_user_data_script(script_path, project_name, github_url, mysql_user=None
     except Exception as ex:
         raise ex
     else:
-        user_data = user_data.replace("py_project_name", project_name)
+        # replace project name
+        user_data = user_data.replace("project_name", project_name)
+        # replace repo name
         user_data = user_data.replace(
-            "py_repo_name", github_url[:-4].split("/")[-1])
-        user_data = user_data.replace("py_github_url", github_url)
+            "repo_name", github_url[:-4].split("/")[-1])
+        # replace github url
+        user_data = user_data.replace("github_url", github_url)
 
         return user_data
 
@@ -48,7 +51,7 @@ def list_all_instance():
             "instance_id": instance.instance_id,
             "public_ip": instance.public_ip_address,
             "status": instance.state["Name"],
-            "launch_time":instance.launch_time.strftime("%Y-%m-%d %H:%M:%S")
+            "launch_time": instance.launch_time.strftime("%Y-%m-%d %H:%M:%S")
         }
         for instance in ec2_list
     ]
@@ -85,7 +88,7 @@ def list_instance_by_name(name_list):
             "instance_id": instance.instance_id,
             "public_ip": instance.public_ip_address,
             "status": instance.state["Name"],
-            "launch_time":instance.launch_time.strftime("%Y-%m-%d %H:%M:%S")
+            "launch_time": instance.launch_time.strftime("%Y-%m-%d %H:%M:%S")
         }
         for instance in ec2_list
     ]
@@ -126,7 +129,7 @@ def create_instance_by_template(launch_template_name, instance_name=None, user_d
                 "instance_id": instance.instance_id,
                 "public_ip": instance.public_ip_address,
                 "status": instance.state["Name"],
-                "launch_time":instance.launch_time.strftime("%Y-%m-%d %H:%M:%S")
+                "launch_time": instance.launch_time.strftime("%Y-%m-%d %H:%M:%S")
             }
             for instance in ec2_list
         ]

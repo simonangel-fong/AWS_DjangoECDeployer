@@ -3,9 +3,9 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu/AWS_EC2_ECDjangoDeploy
+    destination: /home/ubuntu/AWS_ECDjangoDeployer
 permissions:
-  - object: /home/ubuntu/AWS_EC2_ECDjangoDeploy
+  - object: /home/ubuntu/AWS_ECDjangoDeployer
     owner: ubuntu
     group: ubuntu
 #
@@ -13,16 +13,16 @@ hooks:
   BeforeInstall:
     - location: CodeDeploy/BeforeInstall.sh
       timeout: 300
-      runas: root
+      runas: ubuntu
   AfterInstall:
     - location: CodeDeploy/AfterInstall.sh
       timeout: 300
-      runas: root
+      runas: ubuntu
   ApplicationStop:
     - location: CodeDeploy/ApplicationStop.sh
       timeout: 300
-      runas: root
+      runas: ubuntu
   ApplicationStart:
     - location: CodeDeploy/ApplicationStart.sh
       timeout: 300
-      runas: root
+      runas: ubuntu

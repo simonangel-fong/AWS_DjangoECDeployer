@@ -15,8 +15,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 SCRIPT_PATH = Path(
     Path(__file__).resolve().parent,
-    "script",
-    "script_easy_deploy.sh"
+    "userdata_boto3.sh"
 )
 EC2_TEMPLATE = "EC-Deploy-Template"
 

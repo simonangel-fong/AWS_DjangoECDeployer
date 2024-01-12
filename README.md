@@ -9,6 +9,7 @@
   - [Documentation](#documentation)
     - [Deployment steps](#deployment-steps)
     - [Create a Golden Image](#create-a-golden-image)
+    - [Provision EC2 instance](#provision-ec2-instance)
     - [Instance Creation](#instance-creation)
 
 ---
@@ -93,9 +94,11 @@
   - upgrade OS packages
   - Install Nginx package
   - Install Supervisor package
+  - Install CodeDeploy
+  - Install python3-venv
   - Create python virtual environment
   - Install Gunicorn within venv
-  - Clonde target Django project's GitHub
+  - Clone target Django project's GitHub
   - Activate venv
   - Install target project's dependencies
   - Configure Gunicorn
@@ -106,8 +109,36 @@
   - Start gunicorn, ngnix, supervisor
 
 - To improve user experience and automate deployment, the deployment steps should be well-organized:
+
   - using a `Golden Image` to pre-configure the deployment environment.
   - using `user data` script to automate deployment configuration when an EC2 instance is provisioned.
+
+- Deconstruction steps:
+  - **Golden Image**:
+    - includes only the required packages.
+    - Not includes creation of env, because each push of CICD might required new env.
+    - include the log file of creating the Image
+    - key steps:
+      - update OS packages
+      - upgrade OS packages
+      - Install Nginx package
+      - Install Supervisor package
+      - Install CodeDeploy
+      - Install python3-venv
+  - **user data** of provision EC2:
+    - include the log file of deploying app
+    - key steps:
+      - Create python virtual environment
+      - Install Gunicorn within venv
+      - Clone target Django project's GitHub
+      - Activate venv
+      - Install target project's dependencies
+      - Configure Gunicorn
+      - Configure Nginx
+      - Configure Supervisor
+      - Collect static files
+      - Migrate database
+      - Start gunicorn, ngnix, supervisor
 
 ---
 
@@ -115,19 +146,39 @@
 
 - The Golden Image contains:
 
-  - all updated and upgraded OS packages
-  - installed Nginx and Supervisor packages
-  - a python virtual environment
-  - installed Gunicorn within venv
+      - update and upgrade OS packages
+      - Install CodeDeploy package
+      - Install Nginx, Supervisor, python3-venv package
 
 - To create the Golden Image, a user data script is created:
 
-  - Bash script: [userdata_image.sh](./scripts/userdata_image.sh)
+  - Bash script: [userdata_image.sh](./user_data/userdata_image.sh)
 
-- Troubleshooting:
-  - Don't create a VENV in the Golden Image.
-    - reason:Use data use the `root` permission. It will cause permission deny while install the project dependencies during testing bash scripts using the `ubuntu` user permission.
-    - solution: Create VENV while provisioning instance
+---
+
+### Provision EC2 instance
+
+- Use user data to customize deployment for each Django project.
+
+- The steps includes:
+
+  - Create python virtual environment
+  - Install Gunicorn within venv
+  - Clone target Django project's GitHub
+  - Install target project's dependencies
+  - Configure Gunicorn
+  - Configure Nginx
+  - Configure Supervisor
+  - Collect static files
+  - Migrate database
+  - Start gunicorn, ngnix, supervisor
+
+- Bash script: [userdata_provision.sh](./scripts/userdata_provision.sh)
+
+- To improve development efficiency, scripts must be consistent for
+  - deployment of the current app ECDjangoDeployer
+  - CodeDeploy configuration of the current app ECDjangoDeployer
+  - provision of target Django instance
 
 ---
 
@@ -176,19 +227,6 @@
 - Using boto3 to create EC2 instance with user data
 
 ---
-
-- Use user data to customize deployment for each Django project.
-
-- The steps includes:
-  - Clone target Django project's GitHub
-  - Install target project's dependencies
-  - Configure Gunicorn
-  - Configure Nginx
-  - Configure Supervisor
-  - Collect static files
-  - Migrate database
-  - Start gunicorn, ngnix, supervisor
-- Bash script: [userdata_provision.sh](./scripts/userdata_provision.sh)
 
 ---
 
