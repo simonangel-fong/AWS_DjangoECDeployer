@@ -1,6 +1,6 @@
-# EC Django Deployer
+# Django ECDeployer
 
-- [EC Django Deployer](#ec-django-deployer)
+- [Django ECDeployer](#django-ecdeployer)
   - [Overview](#overview)
   - [Features](#features)
   - [Use Cases](#use-cases)
@@ -8,21 +8,21 @@
   - [Diagram](#diagram)
   - [Documentation](#documentation)
     - [Deployment Overview](#deployment-overview)
-    - [Save EC2 Instance Information in the Database](#save-ec2-instance-information-in-the-database)
-    - [Provision EC2 Instance to host Django project](#provision-ec2-instance-to-host-django-project)
+    - [How to save EC2 Instance Information in the Database](#how-to-save-ec2-instance-information-in-the-database)
+    - [How to provision EC2 Instance to host Django project](#how-to-provision-ec2-instance-to-host-django-project)
       - [Create a Golden Image](#create-a-golden-image)
       - [Create a Launch Template](#create-a-launch-template)
     - [Provision EC2 using boto3](#provision-ec2-using-boto3)
-    - [Deployment steps](#deployment-steps)
+    - [How to deploy this project](#how-to-deploy-this-project)
       - [Create an EC2 Instance as this project's server](#create-an-ec2-instance-as-this-projects-server)
-      - [Create `.ven` file](#create-ven-file)
+      - [Create `.env` file](#create-env-file)
       - [Implement Continuous Integration and Deployment (CICD)](#implement-continuous-integration-and-deployment-cicd)
 
 ---
 
 ## Overview
 
-- `EC Django Deployer` is a streamlined solution designed to simplify the deployment process of Django applications on AWS EC2 instances.
+- `Django ECDeployer` is a streamlined solution designed to simplify the deployment process of Django applications on `AWS EC2 instances`.
 - Ideal for developers looking to deploy Django applications on AWS without the complexities of manual setup.
 
 ---
@@ -31,16 +31,18 @@
 
 - **CICD Implementation**:
 
-  - Use AWS `CodeBuild`, `CodePipeline`, and `CodeDeploy` Integration
+  - This project uses AWS `CodeBuild`, `CodePipeline`, and `CodeDeploy` Integration
   - Automates the entire deployment pipeline, from source code changes to EC2 instance provisioning and application deployment.
 
 - **Simplified Deployment:**
 
-  - Requires only two arguments: the **name of the Django project** and the **GitHub repository URL**.
+  - To simplify the Django project deployment, users are required to provide only two key arguments:
+    - the **name of the Django project**
+    - and the **GitHub repository URL**.
 
 - **GitHub Repository Structure:**
 
-  - Enforces a rule for the target Django project's directory structure:
+  - This project enforces a rule for the target Django project's directory structure:
     - The project directory must be located in a direct child subdirectory of the GitHub repository, ensuring a consistent and organized layout.
 
 - **EC2 Instance Provisioning**:
@@ -66,26 +68,24 @@
 
 - video
 
-- screenshot
-
 ---
 
 ## Diagram
 
 ![diagram](./pic/diagram.png)
 
-- **EC Django Deployer CICD Workflow**:
+- **EC Django Deployer CICD Workflow**
 
-  - EC Django Deployer developer commits and pushes new version to the GitHub repository, triggering the CICD workflow using CodePipeline, CodeBuild, and CodeDeploy.
+  - EC Django Deployer developers commit and push a new version to the GitHub repository, triggering the CICD workflow using CodePipeline, CodeBuild, and CodeDeploy.
 
-- **Target Django Project Deployment Workflow**:
+- **Target Django Project Deployment Workflow**
 
-  - 1. Target Django Project owner signs into the EC Django Deployer website with domain name and creates a provision request.
-  - 2. Provision request saves the information of the target Django project.
-  - 3. A new EC2 instance is provisioned using AWS SDK boto3, predefined AMI, and user data script.
+  1. The Target Django Project owner signs into the Django ECDeployer website with a domain name and creates a provisioning request.
+  2. The provisioning request saves the information of the target Django project.
+  3. A new EC2 instance is provisioned using AWS SDK boto3, a predefined AMI, and a user data script.
 
-- **Public users access to Target Project**:
-  - Once the target project's deployment finishes, public users can access to target project using the EC2 instance's public IP address.
+- **Public Users' Access to the Target Project**
+  - Once the deployment of the target project finishes, public users can access the target project using the EC2 instance's public IP address.
 
 ---
 
@@ -93,36 +93,35 @@
 
 ### Deployment Overview
 
-- This project uses the approach of `Django + Gunicorn + Nginx + Supervisor` to deploy Django project.
-- The sequential steps includes:
+- This project utilizes the `Django + Gunicorn + Nginx + Supervisor` approach to deploy Django projects.
+- The sequential steps include:
 
-  - update OS packages
-  - upgrade OS packages
+  - Update OS packages
+  - Upgrade OS packages
   - Install Nginx package
   - Install Supervisor package
   - Install CodeDeploy
   - Install python3-venv
-  - Create python virtual environment
-  - Install Gunicorn within venv
-  - Clone target Django project's GitHub
-  - Activate venv
-  - Install target project's dependencies
+  - Create a Python virtual environment
+  - Install Gunicorn within the virtual environment
+  - Clone the target Django project's GitHub repository
+  - Install the target project's dependencies
   - Configure Gunicorn
   - Configure Nginx
   - Configure Supervisor
-  - Migrate database
-  - Start gunicorn, ngnix, supervisor
+  - Migrate the database
+  - Restart Gunicorn, Nginx, Supervisor
 
-- To improve user experience and automate deployment, the deployment steps should be well-organized:
+- To enhance the user experience and automate deployment, the deployment steps should be well-organized:
 
-  - using a `Golden Image` to pre-configure the deployment environment.
-  - using `user data` script to automate deployment configuration when an EC2 instance is provisioned.
+  - Utilize a `Golden Image` to pre-configure the deployment environment.
+  - Use a `user data` script to automate deployment configuration when an EC2 instance is provisioned.
 
-- **Bash script** is helpful to automate the deployment steps.
+- The use of a **Bash script** is helpful for automating the deployment steps.
 
 ---
 
-### Save EC2 Instance Information in the Database
+### How to save EC2 Instance Information in the Database
 
 - When users initiate the deployment process by clicking the "create" button, the project not only provisions EC2 instances but also intelligently records essential details in the database.
 
@@ -177,7 +176,7 @@ def post(self, request, *args, **kwargs):
 
 ---
 
-### Provision EC2 Instance to host Django project
+### How to provision EC2 Instance to host Django project
 
 #### Create a Golden Image
 
@@ -216,7 +215,8 @@ def post(self, request, *args, **kwargs):
 
 ### Provision EC2 using boto3
 
-- This project defines custom functions using the AWS SDK boto3 to provision EC2 instance to host user's Django project. [aws_ec2_script.py](./EC_Django_Deployer/ECDeploy/aws_ec2_script.py)
+- This project defines custom functions using the AWS SDK boto3 to provision EC2 instance to host user's Django project.
+  - [aws_ec2_script.py](./EC_Django_Deployer/ECDeploy/aws_ec2_script.py)
   - using launch template
   - boto3 function `create_instances()`
   - return the instance's information such as ID, public IP, and etc.
@@ -263,11 +263,12 @@ def create_instance_by_template(launch_template_name, instance_name=None, user_d
         ]
 ```
 
-- This project also create a user data template that custom functions will overwrites to provision EC2 intabase based on user's parameters.[userdata_boto3.sh](./EC_Django_Deployer/ECDeploy/userdata_boto3.sh)
+- This project also create a user data template that custom functions will overwrite to provision EC2 intance based on user's parameters.
+  - [userdata_boto3.sh](./EC_Django_Deployer/ECDeploy/userdata_boto3.sh)
 
 ---
 
-### Deployment steps
+### How to deploy this project
 
 #### Create an EC2 Instance as this project's server
 
@@ -282,15 +283,18 @@ def create_instance_by_template(launch_template_name, instance_name=None, user_d
 
 ---
 
-#### Create `.ven` file
+#### Create `.env` file
 
-- via SSH / using SSM
+- For security season, the credential data are stored within a `.env` file.
+- Using SSH connect or SSM to create this file.
 
 ![env_file01](./pic/env_file01.png)
 
 ---
 
 #### Implement Continuous Integration and Deployment (CICD)
+
+- This project employs `CodePipeline`, `CodeBuild`, and `CodeDeploy` to implement **CICD**.
 
 - **AWS CodeDeploy application specification files**
 
@@ -299,8 +303,7 @@ def create_instance_by_template(launch_template_name, instance_name=None, user_d
   1. [BeforeInstall.sh](./CodeDeploy/BeforeInstall.sh)
 
      - Removes the existing virtual environment directory and GitHub repository directory.
-
-  - Ensures a clean slate before the new deployment.
+     - Ensures a clean slate before the new deployment.
 
   2. [AfterInstall.sh](./CodeDeploy/AfterInstall.sh)
 
@@ -320,14 +323,22 @@ def create_instance_by_template(launch_template_name, instance_name=None, user_d
     - This log captures key steps during the deployment process, providing valuable insights into the CICD pipeline.
     - In case of any issues during the deployment, consult the `deploy.log` file for a comprehensive record of the deployment steps.
 
+![pipeline04](./pic/pipeline04.png)
+
 - Create a `AWS CodePipeline`
 
 ![pipeline01](./pic/pipeline01.png)
 
 - Push local code to GitHub and trigger Deployment
 
----
+![pipeline02](./pic/pipeline02.png)
+
+- Visit the public IP of the server
+
+![pipeline03](./pic/pipeline03.png)
+
+- Now this project has been deployed on the EC2 instance.
 
 ---
 
-[TOP](#ec-django-deployer)
+[TOP](#django-ecdeployer)
