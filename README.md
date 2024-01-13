@@ -7,10 +7,16 @@
   - [Demo](#demo)
   - [Diagram](#diagram)
   - [Documentation](#documentation)
+    - [Deployment Overview](#deployment-overview)
+    - [Save EC2 Instance Information in the Database](#save-ec2-instance-information-in-the-database)
+    - [Provision EC2 Instance to host Django project](#provision-ec2-instance-to-host-django-project)
+      - [Create a Golden Image](#create-a-golden-image)
+      - [Create a Launch Template](#create-a-launch-template)
+    - [Provision EC2 using boto3](#provision-ec2-using-boto3)
     - [Deployment steps](#deployment-steps)
-    - [Create a Golden Image](#create-a-golden-image)
-    - [Provision EC2 instance](#provision-ec2-instance)
-    - [Instance Creation](#instance-creation)
+      - [Create an EC2 Instance as this project's server](#create-an-ec2-instance-as-this-projects-server)
+      - [Create `.ven` file](#create-ven-file)
+      - [Implement Continuous Integration and Deployment (CICD)](#implement-continuous-integration-and-deployment-cicd)
 
 ---
 
@@ -23,19 +29,19 @@
 
 ## Features
 
+- **CICD Implementation**:
+
+  - Use AWS `CodeBuild`, `CodePipeline`, and `CodeDeploy` Integration
+  - Automates the entire deployment pipeline, from source code changes to EC2 instance provisioning and application deployment.
+
 - **Simplified Deployment:**
 
-  - Requires only two arguments: the name of the Django project and the GitHub repository URL.
+  - Requires only two arguments: the **name of the Django project** and the **GitHub repository URL**.
 
 - **GitHub Repository Structure:**
 
   - Enforces a rule for the target Django project's directory structure:
     - The project directory must be located in a direct child subdirectory of the GitHub repository, ensuring a consistent and organized layout.
-
-- **CICD Implementation**:
-
-  - Use AWS `CodeBuild`, `CodePipeline`, and `CodeDeploy` Integration
-  - Automates the entire deployment pipeline, from source code changes to EC2 instance provisioning and application deployment.
 
 - **EC2 Instance Provisioning**:
   - Utilizes a predefined `EC2 instance template` with `user data` to host the Django application.
@@ -85,7 +91,7 @@
 
 ## Documentation
 
-### Deployment steps
+### Deployment Overview
 
 - This project uses the approach of `Django + Gunicorn + Nginx + Supervisor` to deploy Django project.
 - The sequential steps includes:
@@ -104,7 +110,6 @@
   - Configure Gunicorn
   - Configure Nginx
   - Configure Supervisor
-  - Collect static files
   - Migrate database
   - Start gunicorn, ngnix, supervisor
 
@@ -113,118 +118,213 @@
   - using a `Golden Image` to pre-configure the deployment environment.
   - using `user data` script to automate deployment configuration when an EC2 instance is provisioned.
 
-- Deconstruction steps:
-  - **Golden Image**:
-    - includes only the required packages.
-    - Not includes creation of env, because each push of CICD might required new env.
-    - include the log file of creating the Image
-    - key steps:
-      - update OS packages
-      - upgrade OS packages
-      - Install Nginx package
-      - Install Supervisor package
-      - Install CodeDeploy
-      - Install python3-venv
-  - **user data** of provision EC2:
-    - include the log file of deploying app
-    - key steps:
-      - Create python virtual environment
-      - Install Gunicorn within venv
-      - Clone target Django project's GitHub
-      - Activate venv
-      - Install target project's dependencies
-      - Configure Gunicorn
-      - Configure Nginx
-      - Configure Supervisor
-      - Collect static files
-      - Migrate database
-      - Start gunicorn, ngnix, supervisor
+- **Bash script** is helpful to automate the deployment steps.
 
 ---
 
-### Create a Golden Image
+### Save EC2 Instance Information in the Database
 
-- The Golden Image contains:
+- When users initiate the deployment process by clicking the "create" button, the project not only provisions EC2 instances but also intelligently records essential details in the database.
 
-      - update and upgrade OS packages
-      - Install CodeDeploy package
-      - Install Nginx, Supervisor, python3-venv package
+- **Implementation Steps**
 
-- To create the Golden Image, a user data script is created:
+  - **Django Class-Based View**:
 
-  - Bash script: [userdata_image.sh](./user_data/userdata_image.sh)
+    - The project employs Django's class-based views, specifically overriding the post function, to handle deployment requests.
+    - Upon successful form validation, deployment information is prepared for storage.
 
----
+  - **Database Storage**:
+    - Utilizing Django's `update_or_create()` function, the project securely saves the deployment details into the database.
+    - When EC2 instances are provisioned accordingly leveraging the AWS SDK boto3, the instance ID are saved into the database.
 
-### Provision EC2 instance
-
-- Use user data to customize deployment for each Django project.
-
-- The steps includes:
-
-  - Create python virtual environment
-  - Install Gunicorn within venv
-  - Clone target Django project's GitHub
-  - Install target project's dependencies
-  - Configure Gunicorn
-  - Configure Nginx
-  - Configure Supervisor
-  - Collect static files
-  - Migrate database
-  - Start gunicorn, ngnix, supervisor
-
-- Bash script: [userdata_provision.sh](./scripts/userdata_provision.sh)
-
-- To improve development efficiency, scripts must be consistent for
-  - deployment of the current app ECDjangoDeployer
-  - CodeDeploy configuration of the current app ECDjangoDeployer
-  - provision of target Django instance
-
----
-
-### Instance Creation
-
-- **Create or update instance record**
-
-  - The model to store EC2 instance includs instance_id field which is the ID of the launched EC2 instance. This ID is available only when the EC2 instance has been launched.
-
-  - To save or update an Instance in the table, it needs to
-    - save or update the data first,
-    - then wait until untill the instance id is available,
-    - and finally save the instance id.
+- **Code**:
 
 ```py
-  def post(self, request, *args, **kwargs):
+def post(self, request, *args, **kwargs):
+    # get the form
+    form = self.form_class(request.POST)
 
-        form = self.form_class(request.POST)
-        if form.is_valid():
+    # check if the form is valiated
+    if form.is_valid():
 
-            # Creates new instance record
-            obj, created = Instance.objects.update_or_create(
-                name=form.cleaned_data["name"],
-                github_url=form.cleaned_data["github_url"],
-                project_name=form.cleaned_data["project_name"],
-                description=form.cleaned_data["description"],
-            )
+        # Creates new instance record
+        obj, created = Instance.objects.update_or_create(
+            name=form.cleaned_data["name"],
+            github_url=form.cleaned_data["github_url"],
+            project_name=form.cleaned_data["project_name"],
+            description=form.cleaned_data["description"],
+        )
 
-            # code block to create ec2 instance
+        # Creates an new EC2 instance
+        ec2 = create_instance_by_template(
+            EC2_TEMPLATE,
+            form.cleaned_data["name"],
+            user_data
+        )
 
-            # get the instance id when it is created
-            obj.instance_id = ec2[0]["instance_id"]
+        # get the instance id when it is created
+        obj.instance_id = ec2[0]["instance_id"]
 
-            # update the instance id with record
-            obj.save()
+        # update the instance id with record
+        obj.save()
 
-            # redirect to the detail page
-            return redirect("ECDeploy:detail", pk=obj.pk)
+        # redirect to the detail page
+        return redirect("ECDeploy:detail", pk=obj.pk)
 
-        return render(request, self.template_name, {"form": form})
+    return render(request, self.template_name, {"form": form})
 
 ```
 
 ---
 
-- Using boto3 to create EC2 instance with user data
+### Provision EC2 Instance to host Django project
+
+#### Create a Golden Image
+
+- To improve the performance of provision, this project create a golden image.
+- The Golden Image contains:
+
+  - update and upgrade OS packages
+  - Install CodeDeploy package
+  - Install Nginx, Supervisor, python3-venv package
+
+- To create the Golden Image, a user data script is created:
+
+  - Bash script: [userdata_image.sh](./user_data/userdata_image.sh)
+
+- Create an EC2 instance for golden Image and check the log.
+
+![golden_image03](./pic/golden_image03.png)
+
+- Save the image as a Golden Image
+
+![golden_image01](./pic/golden_image01.png)
+
+![golden_image02](./pic/golden_image02.png)
+
+---
+
+#### Create a Launch Template
+
+- using the Golden Image
+
+![golden_image01](./pic/golden_image01.png)
+
+![golden_image02](./pic/golden_image02.png)
+
+---
+
+### Provision EC2 using boto3
+
+- This project defines custom functions using the AWS SDK boto3 to provision EC2 instance to host user's Django project. [aws_ec2_script.py](./EC_Django_Deployer/ECDeploy/aws_ec2_script.py)
+  - using launch template
+  - boto3 function `create_instances()`
+  - return the instance's information such as ID, public IP, and etc.
+
+```py
+def create_instance_by_template(launch_template_name, instance_name=None, user_data=None):
+    ''' Creates an instance from a launch template '''
+
+    if launch_template_name == None:
+        raise ValueError("Parameter launch_template_name is required.")
+    else:
+        ec2 = boto3.resource(
+            service_name='ec2',
+            region_name='us-east-1'
+        )
+        ec2_list = ec2.create_instances(
+            # launch template
+            LaunchTemplate={
+                "LaunchTemplateName": launch_template_name
+            },
+            # name tag
+            TagSpecifications=[
+                {
+                    'ResourceType': 'instance',
+                    'Tags': [
+                        {
+                            'Key': 'Name',
+                            'Value': instance_name
+                        },
+                    ]},
+            ],
+            MinCount=1,
+            MaxCount=1,
+            UserData=user_data,
+        )
+        return [
+            {
+                "instance_id": instance.instance_id,
+                "public_ip": instance.public_ip_address,
+                "status": instance.state["Name"],
+                "launch_time": instance.launch_time.strftime("%Y-%m-%d %H:%M:%S")
+            }
+            for instance in ec2_list
+        ]
+```
+
+- This project also create a user data template that custom functions will overwrites to provision EC2 intabase based on user's parameters.[userdata_boto3.sh](./EC_Django_Deployer/ECDeploy/userdata_boto3.sh)
+
+---
+
+### Deployment steps
+
+#### Create an EC2 Instance as this project's server
+
+- Using Launch Template
+- Using Golden Image
+
+![instance01](./pic/instance01.png)
+
+![instance02](./pic/instance02.png)
+
+![instance03](./pic/instance03.png)
+
+---
+
+#### Create `.ven` file
+
+- via SSH / using SSM
+
+![env_file01](./pic/env_file01.png)
+
+---
+
+#### Implement Continuous Integration and Deployment (CICD)
+
+- **AWS CodeDeploy application specification files**
+
+  - This project implements a robust Continuous Integration and Deployment (CICD) pipeline using `AWS CodeDeploy`. The deployment process is defined by an `appspec.yml` file, which orchestrates the following three main phases:
+
+  1. [BeforeInstall.sh](./CodeDeploy/BeforeInstall.sh)
+
+     - Removes the existing virtual environment directory and GitHub repository directory.
+
+  - Ensures a clean slate before the new deployment.
+
+  2. [AfterInstall.sh](./CodeDeploy/AfterInstall.sh)
+
+     - Creates a virtual environment.
+     - Installs project dependencies and Gunicorn.
+     - Configures Gunicorn, Nginx, and Supervisor.
+     - Sets up the necessary environment for the application.
+
+  3. [ApplicationStart.sh](./CodeDeploy/ApplicationStart.sh)
+     - Handles tasks like migrating the database for Django.
+     - Restarts the service to apply the changes.
+     - Ensures a smooth transition to the updated version of the application.
+
+  - **Deployment Logging**
+
+    - To facilitate troubleshooting and traceability, a detailed log file named `deploy.log` is created in the `/home/ubuntu/log` directory.
+    - This log captures key steps during the deployment process, providing valuable insights into the CICD pipeline.
+    - In case of any issues during the deployment, consult the `deploy.log` file for a comprehensive record of the deployment steps.
+
+- Create a `AWS CodePipeline`
+
+![pipeline01](./pic/pipeline01.png)
+
+- Push local code to GitHub and trigger Deployment
 
 ---
 
