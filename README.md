@@ -15,7 +15,7 @@
     - [Provision EC2 using boto3](#provision-ec2-using-boto3)
     - [How to deploy this project](#how-to-deploy-this-project)
       - [Create an EC2 Instance as this project's server](#create-an-ec2-instance-as-this-projects-server)
-      - [Create `.env` file](#create-env-file)
+      - [Create `.env` file and configure boto3 on EC2 Instance](#create-env-file-and-configure-boto3-on-ec2-instance)
       - [Implement Continuous Integration and Deployment (CICD)](#implement-continuous-integration-and-deployment-cicd)
 
 ---
@@ -66,7 +66,11 @@
 
 ## Demo
 
-- video
+- video:
+
+  - [Project Demo: Django ECDeployer (Django+Bootstrap+AWS)](https://youtu.be/-J_D7dRdriU)
+
+- Deploy a Django project just in less than 2 minutes.
 
 ---
 
@@ -283,12 +287,16 @@ def create_instance_by_template(launch_template_name, instance_name=None, user_d
 
 ---
 
-#### Create `.env` file
+#### Create `.env` file and configure boto3 on EC2 Instance
 
 - For security season, the credential data are stored within a `.env` file.
 - Using SSH connect or SSM to create this file.
 
 ![env_file01](./pic/env_file01.png)
+
+- Install AWS CLI
+
+- configure boto3 on EC2 Instance
 
 ---
 
